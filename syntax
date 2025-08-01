@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE `rakamin-466915.Data.Tabel_Analisa` AS
+CREATE OR REPLACE TABLE `rakamin-466915.Data.tabel_analisa` AS
 SELECT
   ft.transaction_id,
   ft.date,
