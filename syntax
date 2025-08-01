@@ -1,38 +1,38 @@
-CREATE OR REPLACE TABLE `rakamin-466915.Data.tabel_analisa` AS
 SELECT
-  ft.transaction_id,
-  ft.date,
-  kc.branch_id,
-  kc.branch_name,
-  kc.kota,
-  kc.provinsi,
-  kc.rating AS rating_cabang,
-  ft.customer_name,
-  ft.product_id,
-  COALESCE(p.product_name, i.product_name) AS product_name,
-  ft.price AS actual_price,
-  ft.discount_percentage,
+  t.transaction_id,
+  t.date,
+  t.branch_id,
+  c.branch_name,
+  c.kota,
+  c.provinsi,
+  c.rating AS rating_cabang,
+  t.customer_name,
+  t.product_id,
+  p.product_name,
+  p.price AS actual_price,
+  t.discount_percentage,
   CASE
-    WHEN ft.price <= 50000 THEN 0.10
-    WHEN ft.price <= 100000 THEN 0.15
-    WHEN ft.price <= 300000 THEN 0.20
-    WHEN ft.price <= 500000 THEN 0.25
-    ELSE 0.30
+    WHEN p.price <= 50000 THEN 0.1
+    WHEN p.price <= 100000 THEN 0.15
+    WHEN p.price <= 300000 THEN 0.2
+    WHEN p.price <= 500000 THEN 0.25
+    ELSE 0.3
   END AS persentase_gross_laba,
-  ft.price * (1 - ft.discount_percentage / 100.0) AS nett_sales,
-  (ft.price * (1 - ft.discount_percentage / 100.0)) *
+  (p.price * (1 - t.discount_percentage / 100)) AS nett_sales,
+  ((p.price * (1 - t.discount_percentage / 100)) *
     CASE
-      WHEN ft.price <= 50000 THEN 0.10
-      WHEN ft.price <= 100000 THEN 0.15
-      WHEN ft.price <= 300000 THEN 0.20
-      WHEN ft.price <= 500000 THEN 0.25
-      ELSE 0.30
-    END AS nett_profit,
-  ft.rating AS rating_transaksi
-FROM `rakamin-466915.Data.kf_final_transaction` ft
-LEFT JOIN `rakamin-466915.Data.kf_kantor_cabang` kc
-  ON ft.branch_id = kc.branch_id
-LEFT JOIN `rakamin-466915.Data.kf_inventory` i
-  ON ft.branch_id = i.branch_id AND ft.product_id = i.product_id
-LEFT JOIN `rakamin-466915.Data.kf_product` p
-  ON ft.product_id = p.product_id;
+      WHEN p.price <= 50000 THEN 0.1
+      WHEN p.price <= 100000 THEN 0.15
+      WHEN p.price <= 300000 THEN 0.2
+      WHEN p.price <= 500000 THEN 0.25
+      ELSE 0.3
+    END
+  ) AS nett_profit,
+  t.rating AS rating_transaksi
+FROM `rakamin-466915.kimia_farma.kf_final_transaction` t
+JOIN `rakamin-466915.kimia_farma.kf_product` p
+  ON t.product_id = p.product_id
+JOIN `rakamin-466915.kimia_farma.kf_inventory` i
+  ON t.product_id = i.product_id AND t.branch_id = i.branch_id
+JOIN `rakamin-466915.kimia_farma.kf_kantor_cabang` c
+  ON t.branch_id = c.branch_id;
